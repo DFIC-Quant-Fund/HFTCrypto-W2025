@@ -9,7 +9,7 @@ So far, strategy is this
 
 import json
 from trades_db_utils import create_connection
-from create_backtest_tables import setup_backtest_tables
+from research.___create_backtest_tables import setup_backtest_tables
 
 orc_buys = set()
 skips_because_no_creator_sell = 0 # used to see how many trades we would still be in..

@@ -1,2 +1,2 @@
 # HFTCrypto-W2025
-Crypto coin trading
+HFT meme coin trading
