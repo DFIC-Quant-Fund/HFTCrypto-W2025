@@ -16,14 +16,14 @@ class Trade:
         self.user = user
         self.timestamp = timestamp
 
-def create_connection():
+def create_connection(host='localhost', database='CoinTrades', user='root', password='XXXXXXX'):
     """Create a database connection."""
     try:
         connection = mysql.connector.connect(
-            host='localhost',
-            database='CoinTrades',
-            user='root',
-            password='XXXXXXX'
+            host=host,
+            database=database,
+            user=user,
+            password=password
         )
         if connection.is_connected():
             return connection
@@ -39,7 +39,7 @@ def create_tables(connection):
             mint_address VARCHAR(55) NOT NULL UNIQUE,
             creator_address VARCHAR(55) NOT NULL
         );
-    """)
+    """)    
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS trades (
             id INT AUTO_INCREMENT PRIMARY KEY,

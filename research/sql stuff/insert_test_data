@@ -1,0 +1,1 @@
+INSERT INTO coins (mint_address, creator_address) VALUES ("test2", "test2")
