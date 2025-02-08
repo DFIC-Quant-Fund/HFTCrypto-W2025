@@ -23,21 +23,39 @@ from urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 
 
-FETCH_COINS_URL = 'https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=0&limit=50&sort=created_timestamp&order=DESC&includeNsfw=false'
+from dotenv import load_dotenv
+import os
+load_dotenv()
+
+DB_HOSTNAME = os.getenv('DB_HOSTNAME')
+DB_USER = os.getenv('DB_USER')
+DB_PASSWORD = os.getenv('DB_PASSWORD')
+DB_PORT = os.getenv('DB_PORT')
+
+# FETCH_COINS_URL = 'https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=0&limit=50&sort=created_timestamp&order=DESC&includeNsfw=false'
+# FETCH_COINS_HEADERS = {
+#     'Host': 'client-api-2-74b1891ee9f9.herokuapp.com',
+#     'sec-ch-ua': '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
+#     'sec-ch-ua-mobile': '?0',
+#     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+#     'sec-ch-ua-platform': '"Windows"',
+#     'Accept': '*/*',
+#     'dnt': '1',
+#     'Origin': 'https://pump.fun',
+#     'Sec-Fetch-Site': 'cross-site',
+#     'Sec-Fetch-Mode': 'cors',
+#     'Sec-Fetch-Dest': 'empty',
+#     'Referer': 'https://pump.fun/',
+#     'Accept-Language': 'en-US,en;q=0.9',
+# }
+
+FETCH_COINS_URL = 'https://frontend-api-v3.pump.fun/coins?limit=5&offset=0&sort=created_timestamp&order=DESC&includeNsfw=false&complete=false'
 FETCH_COINS_HEADERS = {
-    'Host': 'client-api-2-74b1891ee9f9.herokuapp.com',
-    'sec-ch-ua': '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
-    'sec-ch-ua-mobile': '?0',
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-    'sec-ch-ua-platform': '"Windows"',
+    'Host': 'frontend-api-v3.pump.fun',
+    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36',
     'Accept': '*/*',
-    'dnt': '1',
-    'Origin': 'https://pump.fun',
-    'Sec-Fetch-Site': 'cross-site',
-    'Sec-Fetch-Mode': 'cors',
-    'Sec-Fetch-Dest': 'empty',
-    'Referer': 'https://pump.fun/',
-    'Accept-Language': 'en-US,en;q=0.9',
+    'Accept-Encoding': 'gzip, deflate, br',
+    'Connection': 'keep-alive',
 }
 
 def  add_coin_to_database(connection, mint_address, creator_address):
@@ -59,7 +77,7 @@ def fetch_coins():
         with open(coin_map_file, 'r') as file:
             coin_map = json.load(file)
 
-    connection = create_connection()
+    connection = create_connection(DB_HOSTNAME, 'CoinTrades', DB_USER, DB_PASSWORD)
 
     while True:
         try:

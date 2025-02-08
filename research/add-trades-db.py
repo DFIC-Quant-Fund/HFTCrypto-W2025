@@ -18,31 +18,33 @@ from urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 logging.basicConfig(filename='trade-output.log', level=logging.INFO)
 
+from dotenv import load_dotenv
+import os
+load_dotenv()
+
+DB_HOSTNAME = os.getenv('DB_HOSTNAME')
+DB_USER = os.getenv('DB_USER')
+DB_PASSWORD = os.getenv('DB_PASSWORD')
+DB_PORT = os.getenv('DB_PORT')
 
 
 LAMPORTS_PER_SOL = 1000000000
 NUM_WORKERS = 3
 FETCH_HEADERS = {
-    'Host': 'client-api-2-74b1891ee9f9.herokuapp.com',
-    'sec-ch-ua': '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
-    'sec-ch-ua-mobile': '?0',
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-    'sec-ch-ua-platform': '"Windows"',
+    'Host': 'frontend-api-v3.pump.fun',
+    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36',
     'Accept': '*/*',
-    'dnt': '1',
-    'Origin': 'https://pump.fun',
-    'Sec-Fetch-Site': 'cross-site',
-    'Sec-Fetch-Mode': 'cors',
-    'Sec-Fetch-Dest': 'empty',
-    'Referer': 'https://pump.fun/',
-    'Accept-Language': 'en-US,en;q=0.9',
+    'Accept-Encoding': 'gzip, deflate, br',
+    'Connection': 'keep-alive',
 }
 
 def fetch_trades(token_addr, coin_details, connection):
     offset = 0
     all_trades = []
     while True:
-        url = f"https://client-api-2-74b1891ee9f9.herokuapp.com/trades/{token_addr}?limit=200&offset={offset}"
+        # url = f"https://client-api-2-74b1891ee9f9.herokuapp.com/trades/{token_addr}?limit=200&offset={offset}"
+        url = f"https://frontend-api-v3.pump.fun/trades/all/{token_addr}?limit=200&offset={offset}&minimumSize=0"
+
         response = requests.get(url, headers=FETCH_HEADERS)
         if response.status_code == 429:
             logging.info("Rate Limited, Exiting Program")
@@ -76,7 +78,7 @@ def add_trades_db(connection, all_trades, creator_addr, token_addr):
     add_all_trades(connection, trades, creator_addr, token_addr)
 
 def worker(task_queue):
-    connection = create_connection()
+    connection = create_connection(DB_HOSTNAME, 'CoinTrades', DB_USER, DB_PASSWORD)
 
     while not task_queue.empty():
         try:
