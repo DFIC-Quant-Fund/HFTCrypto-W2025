@@ -58,15 +58,15 @@ FETCH_COINS_HEADERS = {
     'Connection': 'keep-alive',
 }
 
-def  add_coin_to_database(connection, mint_address, creator_address):
+def  add_coin_to_database(connection, mint_address, creator_address, mint_date, coin_name, coin_symbol):
     """Insert a new coin into the coins table."""
 
     # sleep one second to avoid false duplicate creator with trade client
     time.sleep(1)
 
-    query = "INSERT INTO coins (mint_address, creator_address) VALUES (%s, %s) ON DUPLICATE KEY UPDATE id=id"
+    query = "INSERT INTO coins (mint_address, creator_address, mint_date, coin_name, coin_symbol) VALUES (%s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE id=id"
     cursor = connection.cursor()
-    cursor.execute(query, (mint_address, creator_address))
+    cursor.execute(query, (mint_address, creator_address, mint_date, coin_name, coin_symbol))
     connection.commit()
 
 def fetch_coins():
@@ -86,20 +86,25 @@ def fetch_coins():
 
             updated = False
             for coin in coins:
+                print(coin)
                 token_addr = coin["mint"]
 
                 if token_addr not in coin_map:
                     creator_addr = coin["creator"]
-                    create_time = coin["created_timestamp"]
+                    mint_date = coin["created_timestamp"]
+                    coin_name = coin["name"]
+                    coin_symbol = coin["symbol"]
                     new_coin = {
                         "tokenAddr": token_addr,
                         "creatorAddr": creator_addr,
-                        "createTime": create_time,
+                        "createTime": mint_date,
+                        "name": coin_name,
+                        "symbol": coin_symbol,
                     }
 
                     coin_map[token_addr] = new_coin
                     updated = True
-                    add_coin_to_database(connection, token_addr, creator_addr)
+                    add_coin_to_database(connection, token_addr, creator_addr, mint_date, coin_name, coin_symbol)
                     print(f'Added new coin: {coin["name"]} {coin["mint"]}')
 
             # Save updated map to file if there were updates
