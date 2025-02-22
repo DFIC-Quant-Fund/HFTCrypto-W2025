@@ -3,7 +3,7 @@ Create the CoinTrades database, add in tables for Coins and Trades.
 Also, create some functions used to interact with the db for future analysis.
 '''
 
-import mysql.connector
+import mysql.connector, os
 from mysql.connector import Error
 
 class Trade:
@@ -16,7 +16,7 @@ class Trade:
         self.user = user
         self.timestamp = timestamp
 
-def create_connection(host='localhost', database='CoinTrades', user='root', password='XXXXXXX'):
+def create_connection(host='XXX', database='CoinTrades', user='XXX', password='XXX'):
     """Create a database connection."""
     try:
         connection = mysql.connector.connect(
@@ -33,11 +33,19 @@ def create_connection(host='localhost', database='CoinTrades', user='root', pass
 def create_tables(connection):
     """Create tables if they do not exist."""
     cursor = connection.cursor()
+
+    # If you need to re-create the tables
+    # cursor.execute("DROP TABLE IF EXISTS trades;")
+    # cursor.execute("DROP TABLE IF EXISTS coins;")
+
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS coins (
             id INT AUTO_INCREMENT PRIMARY KEY,
             mint_address VARCHAR(55) NOT NULL UNIQUE,
-            creator_address VARCHAR(55) NOT NULL
+            creator_address VARCHAR(55) NOT NULL,
+            mint_date VARCHAR(55) NOT NULL,
+            coin_name VARCHAR(55) NOT NULL,
+            coin_symbol VARCHAR(55) NOT NULL
         );
     """)    
     cursor.execute("""
@@ -56,11 +64,11 @@ def create_tables(connection):
     print("Tables created (if they did not exist)")
     cursor.close()
 
-def create_coin(connection, mint_address, creator_address):
+def create_coin(connection, mint_address, creator_address, mint_date, coin_name, coin_symbol):
     """Insert a new coin into the coins table."""
-    query = "INSERT INTO coins (mint_address, creator_address) VALUES (%s, %s) ON DUPLICATE KEY UPDATE id=id"
+    query = "INSERT INTO coins (mint_address, creator_address, mint_date, coin_name, coin_symbol) VALUES (%s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE id=id"
     cursor = connection.cursor()
-    cursor.execute(query, (mint_address, creator_address))
+    cursor.execute(query, (mint_address, creator_address, mint_date, coin_name, coin_symbol))
     connection.commit()
     coin_id = cursor.lastrowid
     cursor.close()
@@ -75,7 +83,7 @@ def retrieve_coin_id(connection, mint_address):
     cursor.close()
     return row[0] if row else None
 
-def add_all_trades(connection, trades, creator_addr, token_addr):
+def add_all_trades(connection, trades, creator_addr, token_addr, mint_date, coin_name, coin_symbol):
     """Insert multiple new trades into the trades table using the mint addresses of the coins."""
     cursor = connection.cursor()
 
@@ -84,13 +92,13 @@ def add_all_trades(connection, trades, creator_addr, token_addr):
     VALUES (%s, %s, %s, %s, %s, %s, %s)
     """
     for trade in trades:
-        coin_id = create_coin(connection, trade.mint_address, creator_addr)
+        coin_id = create_coin(connection, trade.mint_address, creator_addr, mint_date, coin_name, coin_symbol)
         data = (coin_id, trade.signature, trade.sol_amount, trade.token_amount, trade.is_buy, trade.user, trade.timestamp)
         cursor.execute(query, data)
 
     # handle for coins with no trades so we can skip in future
     if len(trades) == 0:
-        coin_id = create_coin(connection, token_addr, creator_addr)
+        coin_id = create_coin(connection, token_addr, creator_addr, mint_date, coin_name, coin_symbol)
         data = (coin_id, "N/A", -1, -1, False, "N/A", -1)
         cursor.execute(query, data)
 

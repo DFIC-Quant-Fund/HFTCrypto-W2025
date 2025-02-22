@@ -58,9 +58,9 @@ def fetch_trades(token_addr, coin_details, connection):
         offset += 200
         time.sleep(5.5)
 
-    add_trades_db(connection, all_trades, coin_details["creatorAddr"], coin_details["tokenAddr"])
+    add_trades_db(connection, all_trades, coin_details["creatorAddr"], coin_details["tokenAddr"], coin_details["createTime"], coin_details["name"], coin_details["symbol"])
 
-def add_trades_db(connection, all_trades, creator_addr, token_addr):
+def add_trades_db(connection, all_trades, creator_addr, token_addr, mint_date, coin_name, coin_symbol):
     trades = []
 
     for trade in all_trades:
@@ -75,7 +75,7 @@ def add_trades_db(connection, all_trades, creator_addr, token_addr):
         new_trade = Trade(mint_addr, sig, sol_amount, token_amount, is_buy, user, timestamp)
         trades.append(new_trade)
 
-    add_all_trades(connection, trades, creator_addr, token_addr)
+    add_all_trades(connection, trades, creator_addr, token_addr, mint_date, coin_name, coin_symbol)
 
 def worker(task_queue):
     connection = create_connection(DB_HOSTNAME, 'CoinTrades', DB_USER, DB_PASSWORD)
