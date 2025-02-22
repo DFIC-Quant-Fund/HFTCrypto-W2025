@@ -6,11 +6,6 @@ Also, create some functions used to interact with the db for future analysis.
 import mysql.connector, os
 from mysql.connector import Error
 
-DB_HOSTNAME = os.getenv('DB_HOSTNAME')
-DB_USER = os.getenv('DB_USER')
-DB_PASSWORD = os.getenv('DB_PASSWORD')
-DB_PORT = os.getenv('DB_PORT')
-
 class Trade:
     def __init__(self, mint_address, signature, sol_amount, token_amount, is_buy, user, timestamp):
         self.mint_address = mint_address
