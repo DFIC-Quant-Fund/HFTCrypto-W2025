@@ -4,9 +4,13 @@ as well as a JSON file containing all coins.
 
 Coins in JSON are stored in format:
 {
-    "tokenAddr": xxxx,
-    "creatorAddr": xxxx,
-    "createTime": xxxxx,
+    "id:" int,
+    "mint_address": VARCHAR,
+    "creator_address": VARCHAR,
+    "mint_date": VARCHAR,
+    "coin_name"" VARCHAR,
+    "coin_symbol:" VARCHAR,
+    "
 }
 '''
 
