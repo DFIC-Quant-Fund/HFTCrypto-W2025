@@ -90,7 +90,7 @@ def fetch_coins():
 
             updated = False
             for coin in coins:
-                print(coin)
+                # print(coin)
                 token_addr = coin["mint"]
 
                 if token_addr not in coin_map:
