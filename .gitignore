@@ -26,3 +26,4 @@ go.work.sum
 
 # venv folder
 .venv/
+venv
